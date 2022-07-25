@@ -1,0 +1,282 @@
+{
+    "MacAddress": {
+        "ID": "MacAddress",
+        "Name": "MacAddress",
+        "Oid": ".1.3.6.1.2.1.2.2.1.6.2",
+        "Type": "OctetString",
+        "isTag": true,
+        "isIndexed": false
+    },
+    "docsIfCmtsCmStatusMacAddress": {
+        "ID": "docsIfCmtsCmStatusMacAddress",
+        "Name": "docsIfCmtsCmStatusMacAddress",
+        "Oid": ".1.3.6.1.2.1.10.127.1.3.3.1.2",
+        "Type": "OctetString",
+        "isTag": true,
+        "isIndexed": true
+    },
+    "docsIfCmtsCmStatusIpAddress": {
+        "ID": "docsIfCmtsCmStatusIpAddress",
+        "Name": "docsIfCmtsCmStatusIpAddress",
+        "Oid": ".1.3.6.1.2.1.10.127.1.3.3.1.3",
+        "Type": "OctetString",
+        "isTag": true,
+        "isIndexed": true
+    },
+    "docsIfCmtsCmStatusDownChannelIfIndex": {
+        "ID": "docsIfCmtsCmStatusDownChannelIfIndex",
+        "Name": "docsIfCmtsCmStatusDownChannelIfIndex",
+        "Oid": ".1.3.6.1.2.1.10.127.1.3.3.1.4",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },
+    "docsIfCmtsCmStatusUpChannelIfIndex": {
+        "ID": "docsIfCmtsCmStatusUpChannelIfIndex",
+        "Name": "docsIfCmtsCmStatusUpChannelIfIndex",
+        "Oid": ".1.3.6.1.2.1.10.127.1.3.3.1.5",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },
+    "docsIf3CmtsCmUsStatusSignalNoise": {
+        "ID": "docsIf3CmtsCmUsStatusSignalNoise",
+        "Name": "docsIf3CmtsCmUsStatusSignalNoise",
+        "Oid": ".1.3.6.1.4.1.4491.2.1.20.1.4.1.4",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true,
+        "isDoubleIndexed":true
+    },
+    "docsIf3CmtsCmUsStatusCorrecteds": {
+        "ID": "docsIf3CmtsCmUsStatusCorrecteds",
+        "Name": "docsIf3CmtsCmUsStatusCorrecteds",
+        "Oid": ".1.3.6.1.4.1.4491.2.1.20.1.4.1.9",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true,
+        "isDoubleIndexed":true
+    },
+    "docsIf3CmtsCmUsStatusUncorrectables": {
+        "ID": "docsIf3CmtsCmUsStatusUncorrectables",
+        "Name": "docsIf3CmtsCmUsStatusUncorrectables",
+        "Oid": ".1.3.6.1.4.1.4491.2.1.20.1.4.1.10",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true,
+        "isDoubleIndexed":true
+    },
+    "docsIf3CmtsCmUsStatusUnerroreds": {
+        "ID": "docsIf3CmtsCmUsStatusUnerroreds",
+        "Name": "docsIf3CmtsCmUsStatusUnerroreds",
+        "Oid": ".1.3.6.1.4.1.4491.2.1.20.1.4.1.8",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true,
+        "isDoubleIndexed":true
+    }, 
+    "docsIfDownChannelPower": {
+        "ID": "docsIfDownChannelPower",
+        "Name": "docsIfDownChannelPower",
+        "Oid": ".1.3.6.1.2.1.10.127.1.1.1.1.6",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    }, 
+    "docsIfDownChannelFrequency": {
+        "ID": "docsIfDownChannelFrequency",
+        "Name": "docsIfDownChannelFrequency",
+        "Oid": ".1.3.6.1.2.1.10.127.1.1.1.1.2",
+        "Type": "Integer",
+        "isTag": true,
+        "isIndexed": true
+    }, 
+    "docsIfDownChannelModulation": {
+        "ID": "docsIfDownChannelModulation",
+        "Name": "docsIfDownChannelModulation",
+        "Oid": ".1.3.6.1.2.1.10.127.1.1.1.1.4",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    }, 
+    
+
+    "docsIf3CmStatusUsTxPower": {
+        "ID": "docsIf3CmStatusUsTxPower",
+        "Name": "docsIf3CmStatusUsTxPower",
+        "Oid": ".1.3.6.1.4.1.4491.2.1.20.1.2.1.1",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    }, 
+    "docsIfSigQCorrecteds": {
+        "ID": "docsIfSigQCorrecteds",
+        "Name": "docsIfSigQCorrecteds",
+        "Oid": ".1.3.6.1.2.1.10.127.1.1.4.1.3",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    }, 
+    "docsIfSigQMicroreflections": {
+        "ID": "docsIfSigQMicroreflections",
+        "Name": "docsIfSigQMicroreflections",
+        "Oid": ".1.3.6.1.2.1.10.127.1.1.4.1.6",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    }, 
+     "docsIfUpChannelFrequency": {
+        "ID": "docsIfUpChannelFrequency",
+        "Name": "docsIfUpChannelFrequency",
+        "Oid": ".1.3.6.1.2.1.10.127.1.1.2.1.2",
+        "Type": "Integer",
+        "isTag": true,
+        "isIndexed": true
+    }, 
+    "docsIfSigQSignalNoise": {
+        "ID": "docsIfSigQSignalNoise",
+        "Name": "docsIfSigQSignalNoise",
+        "Oid": ".1.3.6.1.2.1.10.127.1.1.4.1.5",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },     
+    "docsIfSigQUncorrectables": {
+        "ID": "docsIfSigQUncorrectables",
+        "Name": "docsIfSigQUncorrectables",
+        "Oid": ".1.3.6.1.2.1.10.127.1.1.4.1.4",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },     
+
+
+    "docsIfSigQUncorrectables": {
+        "ID": "docsIfSigQUncorrectables",
+        "Name": "docsIfSigQUncorrectables",
+        "Oid": ".1.3.6.1.2.1.10.127.1.1.4.1.4",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },     
+
+    "docsIfSigQUnerroreds": {
+        "ID": "docsIfSigQUnerroreds",
+        "Name": "docsIfSigQUnerroreds",
+        "Oid": ".1.3.6.1.2.1.10.127.1.1.4.1.2",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },     
+
+    "docsIfUpChannelModulation": {
+        "ID": "docsIfUpChannelModulation",
+        "Name": "docsIfUpChannelModulation",
+        "Oid": ".1.3.6.1.2.1.10.127.1.1.2.1.4",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },     
+    "docsIfUpChannelWidth": {
+        "ID": "docsIfUpChannelWidth",
+        "Name": "docsIfUpChannelWidth",
+        "Oid": ".1.3.6.1.2.1.10.127.1.1.2.1.3",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },
+
+
+
+    "ifAlias": {
+        "ID": "ifAlias",
+        "Name": "ifAlias",
+        "Oid": ".1.3.6.1.2.1.10.127.1.1.1.1.2",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },     
+    "ifName": {
+        "ID": "ifName",
+        "Name": "ifName",
+        "Oid": ".1.3.6.1.2.1.31.1.1.1.1",
+        "Type": "Integer",
+        "isTag": true,
+        "isIndexed": true
+    },     
+    "ifSpeed": {
+        "ID": "ifSpeed",
+        "Name": "ifSpeed",
+        "Oid": ".1.3.6.1.2.1.2.2.1.5",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },     
+    "ifType": {
+        "ID": "ifType",
+        "Name": "ifType",
+        "Oid": ".1.3.6.1.2.1.2.2.1",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },     
+    "ifHCInOctets": {
+        "ID": "ifHCInOctets",
+        "Name": "ifHCInOctets",
+        "Oid": ".1.3.6.1.2.1.31.1.1.1.6",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },     
+    "ifHCOutOctets": {
+        "ID": "ifHCOutOctets",
+        "Name": "ifHCOutOctets",
+        "Oid": ".1.3.6.1.2.1.31.1.1.1.10",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },     
+ "ifHCInUcastPkts": {
+        "ID": "ifHCInUcastPkts",
+        "Name": "ifHCInUcastPkts",
+        "Oid": ".1.3.6.1.2.1.31.1.1.1.7",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },     
+ "ifHCOutUcastPkts": {
+        "ID": "ifHCOutUcastPkts",
+        "Name": "ifHCOutUcastPkts",
+        "Oid": ".1.3.6.1.2.1.31.1.1.1.11",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },     
+ "ifOperStatus": {
+        "ID": "ifOperStatus",
+        "Name": "ifOperStatus",
+        "Oid": ".1.3.6.1.2.1.2.2.1.8",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },     
+ "ifInErrors": {
+        "ID": "ifInErrors",
+        "Name": "ifInErrors",
+        "Oid": ".1.3.6.1.2.1.2.2.1.14",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    },     
+ "ifOutErrors": {
+        "ID": "ifOutErrors",
+        "Name": "ifOutErrors",
+        "Oid": ".1.3.6.1.2.1.2.2.1.20",
+        "Type": "Integer",
+        "isTag": false,
+        "isIndexed": true
+    }
+
+}
+
+

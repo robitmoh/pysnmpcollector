@@ -1,0 +1,72 @@
+{
+    "cmts" :{ 
+        "ID": "cmts",
+        "Name":"cmts",
+        "Mode": "doubleindextag",
+        "updateFreq":300,
+        "IndexCache": 1800,
+        "IndexOid": ".1.3.6.1.2.1.10.127.1.3.3.1.2",
+        "IndexTag": "cm",
+        "SecondIndexOid": ".1.3.6.1.2.1.10.127.1.1.2.1.2",
+        "SecondIndexTag":"docsIfUpChannelFrequency",
+        "MetricIDs": [
+            "docsIf3CmtsCmUsStatusSignalNoise",
+            "docsIf3CmtsCmUsStatusUnerroreds",
+            "docsIf3CmtsCmUsStatusCorrecteds",
+            "docsIf3CmtsCmUsStatusUncorrectables"
+            
+        ]
+    },
+    "cm" :{ 
+        "ID": "cm",
+        "Name":"Cable modem",
+        "Mode": "indextag",
+        "updateFreq":300,
+        "IndexOid": ".1.3.6.1.2.1.10.127.1.1.1.1.2",
+        "IndexCache": 1800,
+        "IndexTag": "docsIfDownChannelFrequency",
+        "dumpIndex":true,
+        "MetricIDs": [
+            "docsIfSigQUnerroreds",
+            "docsIfDownChannelFrequency",
+            "docsIfDownChannelModulation",
+            "docsIfDownChannelPower",
+            "docsIfSigQCorrecteds",
+            "docsIfSigQMicroreflections",
+            "docsIfSigQSignalNoise",
+            "docsIfSigQUncorrectables"
+        ]
+    },
+    "cmus" :{ 
+        "ID": "cmus",
+        "Name":"Cable modem",
+        "Mode": "indextag",
+        "updateFreq":300,
+        "IndexOid": ".1.3.6.1.2.1.10.127.1.1.2.1.2",
+        "IndexCache": 1800,
+        "IndexTag": "docsIfUpChannelFrequency",
+        "MetricIDs": [
+            "docsIf3CmStatusUsTxPower",
+            "docsIfUpChannelFrequency",
+            "docsIfUpChannelModulation",
+            "docsIfUpChannelWidth"
+        ]
+    },
+    "etherports" :{ 
+        "ID": "etherports",
+        "Name":"Cable modem etherports",
+        "Mode": "indextag",
+        "updateFreq":300,
+        "IndexOid": ".1.3.6.1.2.1.2.2.1.2",
+        "IndexCache": 1800,
+        "IndexTag": "ifDescr",
+        "MetricIDs": [
+            "docsIf3CmStatusUsTxPower",
+            "docsIfUpChannelFrequency",
+            "docsIfUpChannelModulation",
+            "docsIfUpChannelWidth"
+        ]
+    }
+}
+
+
