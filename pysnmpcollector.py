@@ -79,7 +79,7 @@ if __name__=='__main__':
 
 
     config = configparser.ConfigParser()
-    config.read('pysnmpcollector.cfg')
+    config.read('./cfg/pysnmpcollector.cfg')
 
     try:
         os.makedirs(config['logging']['logdir']+"/json_dump/")

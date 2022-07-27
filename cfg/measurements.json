@@ -1,7 +1,7 @@
 {
-    "cmts" :{ 
-        "ID": "cmts",
-        "Name":"cmts",
+    "cmts_cm" :{ 
+        "ID": "cmts_cm",
+        "Name":"cmts_cm",
         "Mode": "doubleindextag",
         "updateFreq":300,
         "IndexCache": 1800,
@@ -9,12 +9,12 @@
         "IndexTag": "cm",
         "SecondIndexOid": ".1.3.6.1.2.1.10.127.1.1.2.1.2",
         "SecondIndexTag":"docsIfUpChannelFrequency",
+        "dumpIndex":true,
         "MetricIDs": [
             "docsIf3CmtsCmUsStatusSignalNoise",
             "docsIf3CmtsCmUsStatusUnerroreds",
             "docsIf3CmtsCmUsStatusCorrecteds",
             "docsIf3CmtsCmUsStatusUncorrectables"
-            
         ]
     },
     "cm" :{ 

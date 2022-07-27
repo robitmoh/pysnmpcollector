@@ -147,8 +147,8 @@ class measurement_Thread(Thread):
         self.log_rotating_handler = RotatingFileHandler(self.logfile, maxBytes=int(self.config['logging']['measurement_maxBytes']), backupCount=int(self.config['logging']['measurement_backupCount']))
         self.logging_formatter = logging.Formatter('%(asctime)s - %(name)-14s - %(levelname)-8s - %(message)s')
         self.logging_handler.setFormatter(self.logging_formatter)
-        self.logging.addHandler(self.logging_handler)
         self.logging.addHandler(self.log_rotating_handler)
+        self.logging.addHandler(self.logging_handler)
         self.logging.setLevel(self.config['logging']['measurement_level'].upper())   
         #(, self.logfile) #logging.getLogger(self.MeasurementID)
         try :
@@ -188,10 +188,14 @@ class measurement_Thread(Thread):
         if not self.IndexTime  or now - self.IndexTime > timedelta(seconds=int(self.measurement['IndexCache'])):
             self.logging.info("Get measurement index data for : %s IndexOid: %s",self.MeasurementID, Oid)
             
-            snmp=NETsnmp(self.address,self.community)
-            snmp.modName=self.MeasurementID
-            ErrorStr,ErrorInd,ErrorNum, IndexResult=snmp.snmpwalk(Oid)            
-            del snmp
+            try:
+                snmp=NETsnmp(self.address,self.community)
+                snmp.modName=self.MeasurementID
+                ErrorStr,ErrorInd,ErrorNum, IndexResult=snmp.snmpwalk(Oid)            
+                del snmp
+            except Exception as s:
+                self.logging.debug('index query error %s   ',s)
+
             if ErrorNum == 0 and ErrorInd !=-24:
                 self.indexready=True
                 self.IndexTime=datetime.now()
@@ -199,7 +203,7 @@ class measurement_Thread(Thread):
                 self.logging.info("Index data for : %s IndexOid: %s  Time  %0.3fsec ",self.MeasurementID, Oid ,(time.time()-start) )                
                 self.IndexedIndexResult=self.indexed_result(IndexResult)
                 if self.dumpIndex:
-                    file=self.config['logging']['logdir']+'/json_dump/{}-{}-Index.json'.format( self.host_data['ID'], self.MeasurementID )
+                    file=self.config['base']['tmp_dir']+'/json_dump/{}-{}-Index.json'.format( self.host_data['ID'], self.MeasurementID )
                     self.root.dumpjson(file,self.IndexedIndexResult)
 
                 return
@@ -226,10 +230,10 @@ class measurement_Thread(Thread):
     def getSecondIndex(self):
         try:
             Oid=self.measurement['SecondIndexOid']
-            SecondIndexCache=self.measurement['SecondIndexCache']
+            #SecondIndexCache=self.measurement['SecondIndexCache']
             SecondIndexTag=self.measurement['SecondIndexTag']
-        except:
-            self.logging.error("Second index error please specify the SecondIndexCache, SecondIndexOid, SecondIndexTag element in measurments.json : %s",self.MeasurementID)
+        except Exception as s:
+            self.logging.error("Second index error please specify the SecondIndexOid, SecondIndexTag element in measurments.json : %s %s",self.MeasurementID,s)
         self.SecondIndex_ErrorIndication=False
         now=datetime.now()
         start=time.time()
@@ -245,10 +249,10 @@ class measurement_Thread(Thread):
                 self.SecondIndexReady=True
                 self.SecondIndexTime=datetime.now()
                 #self.processSleep=1
-                self.logging.info("SecondIndex data for : %s IndexOid: %s  %s Time  %0.3fsec ",self.MeasurementID, Oid, self.SecondIndex_ErrorIndication,(time.time()-start) )                
+                self.logging.info("SecondIndex data for : %s IndexOid: %s  Time  %0.3fsec ",self.MeasurementID, Oid, (time.time()-start) )                
                 self.SecondIndexedIndexResult=self.indexed_result(IndexResult)
                 if self.dumpIndex:
-                    file=self.config['logging']['logdir']+'/json_dump/{}-{}-SecondIndex.json'.format( self.host_data['ID'], self.MeasurementID )
+                    file=self.config['base']['tmp_dir']+'/json_dump/{}-{}-SecondIndex.json'.format( self.host_data['ID'], self.MeasurementID )
                     self.root.dumpjson(file,self.SecondIndexedIndexResult)
 
                 return 
@@ -274,8 +278,10 @@ class measurement_Thread(Thread):
         self.getIndex()
         if self.isDoubleIndexed:
             self.getSecondIndex()
+        self.logging.debug("IndexGather IndexReady:%s IndexError:%s SecondIndexReady:%s SecondIndexError:%s", self.indexready, self.Index_ErrorIndication,self.SecondIndexReady, self.SecondIndex_ErrorIndication )
         self._indextimer = Timer(interval=self.indexUpdateFreq, function=self.getIndexes)
         self._indextimer.start()
+
         # IndexResult=self.getIndex()
         # if not self.Index_ErrorIndication :
         #     self.IndexedIndexResult=self.indexed_result(IndexResult)
@@ -341,7 +347,8 @@ class measurement_Thread(Thread):
                 if metric_instance.dataready ==True or metric_instance.MetricError ==True :
                     n=n+1
                 else:
-                    self.logging.debug("Measurement metric: %s data gather is NOT ready: %s subprocess(%s/%s)", metric_instance.MetricId, metric_instance.dataready,len(self.managers),n)
+                    pass
+                    #self.logging.debug("Measurement metric: %s data gather is NOT ready: %s subprocess(%s/%s)", metric_instance.MetricId, metric_instance.dataready,len(self.managers),n)
 
             if n >= len(self.managers):
                 self.MeasurementReady=True
@@ -408,7 +415,7 @@ class measurement_Thread(Thread):
    
     def run(self):
         #while True:
-        self._indextimer = Timer(interval=randint(1,self.updateFreq/2), function=self.getIndexes)
+        self._indextimer = Timer(interval=randint(1,2), function=self.getIndexes)
         self._indextimer.start()
         self._timer = Timer(interval=randint(10,self.updateFreq/2), function=self.DataGather)
         self._timer.start()
@@ -449,7 +456,7 @@ class measurement_Thread(Thread):
     def writeInflux(self,MeasurementDatas):
         if len(MeasurementDatas):
                 if self.dumpInfluxData:
-                    file=self.config['logging']['logdir']+'/json_dump/{}-{}.json'.format( self.host_data['ID'], self.MeasurementID )
+                    file=self.config['base']['tmp_dir']+'/json_dump/{}-{}.json'.format( self.host_data['ID'], self.MeasurementID )
                     self.root.dumpjson(file,MeasurementDatas)
                     
                 if len(MeasurementDatas) <10:
