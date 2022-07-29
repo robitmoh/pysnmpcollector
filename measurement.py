@@ -117,7 +117,7 @@ class measurement_Thread(Thread):
         self.indexUpdateFreq=self.measurement['IndexCache']
         #self.netsnmp=netsnmp
         #self.netsnmp_session=netsnmp.Session( Version=2, DestHost=self.address, Community=self.community,  Timeout=1000000, Retries=3, UseNumeric=1)
-        self.timeoutTime=240
+        self.timeoutTime=320
         self.timeout=False
         self.waitMeasurementData=1
         self.processSleep=1  # run function sleep time
@@ -129,7 +129,7 @@ class measurement_Thread(Thread):
                 isDoubleIndexed=False
             if isDoubleIndexed:            
                 self.isDoubleIndexed=True
-        self.indexready=False
+        self.IndexReady=False
         self.SecondIndexTime=None
         self.SecondIndex_ErrorIndication=False
         self.SecondIndexReady=False
@@ -137,7 +137,7 @@ class measurement_Thread(Thread):
         self.dumpInfluxData=self.config['influx']['dump_influx']
         self.isRunning=False
         self.processTime=0
-        self.MeasurementMetricError=0
+        self.MeasurementMetricError={}
 
         self.logfile=self.config['logging']['logdir']+'/host_logs/'+self.host_data['ID']+'-'+self.MeasurementID+'.log'
         #self.logfile=''
@@ -176,8 +176,8 @@ class measurement_Thread(Thread):
             for row in data:
                     indexed_result[int(row.index)]=row.value
             return indexed_result
-        except:
-            self.logging.error('Walk data indexing error %s   ',self.MeasurementID)
+        except Exception as s:
+            self.logging.error('Walk data indexing error %s  : %s ',self.MeasurementID ,s)
 
 
     def getIndex(self):
@@ -197,19 +197,19 @@ class measurement_Thread(Thread):
                 self.logging.debug('index query error %s   ',s)
 
             if ErrorNum == 0 and ErrorInd !=-24:
-                self.indexready=True
+                self.IndexReady=True
                 self.IndexTime=datetime.now()
                 #self.processSleep=1
                 self.logging.info("Index data for : %s IndexOid: %s  Time  %0.3fsec ",self.MeasurementID, Oid ,(time.time()-start) )                
-                self.IndexedIndexResult=self.indexed_result(IndexResult)
+                #self.IndexedIndexResult=self.indexed_result(IndexResult)
                 if self.dumpIndex:
                     file=self.config['base']['tmp_dir']+'/json_dump/{}-{}-Index.json'.format( self.host_data['ID'], self.MeasurementID )
-                    self.root.dumpjson(file,self.IndexedIndexResult)
+                    self.root.dumpjson(file,self.indexed_result(IndexResult))
 
                 return
             else:
                 self.Index_ErrorIndication=True
-                self.indexready=False
+                self.IndexReady=False
                 self.IndexTime=datetime.now()
                 #self.processSleep=self.measurement['IndexCache']
                 self.logging.error('SNMP IndexQuery error ErrorStr:%s  ErrorInd:%s ErrorNum:%s ', 
@@ -250,10 +250,10 @@ class measurement_Thread(Thread):
                 self.SecondIndexTime=datetime.now()
                 #self.processSleep=1
                 self.logging.info("SecondIndex data for : %s IndexOid: %s  Time  %0.3fsec ",self.MeasurementID, Oid, (time.time()-start) )                
-                self.SecondIndexedIndexResult=self.indexed_result(IndexResult)
+                #self.SecondIndexedIndexResult=self.indexed_result(IndexResult)
                 if self.dumpIndex:
                     file=self.config['base']['tmp_dir']+'/json_dump/{}-{}-SecondIndex.json'.format( self.host_data['ID'], self.MeasurementID )
-                    self.root.dumpjson(file,self.SecondIndexedIndexResult)
+                    self.root.dumpjson(file,self.indexed_result(IndexResult))
 
                 return 
             else:
@@ -275,12 +275,19 @@ class measurement_Thread(Thread):
    
 
     def getIndexes(self):
+        self.RunIndex=True
         self.getIndex()
         if self.isDoubleIndexed:
             self.getSecondIndex()
-        self.logging.debug("IndexGather IndexReady:%s IndexError:%s SecondIndexReady:%s SecondIndexError:%s", self.indexready, self.Index_ErrorIndication,self.SecondIndexReady, self.SecondIndex_ErrorIndication )
-        self._indextimer = Timer(interval=self.indexUpdateFreq, function=self.getIndexes)
-        self._indextimer.start()
+        self.logging.debug("IndexGather IndexReady:%s IndexError:%s SecondIndexReady:%s SecondIndexError:%s", self.IndexReady, self.Index_ErrorIndication,self.SecondIndexReady, self.SecondIndex_ErrorIndication )
+        self.RunIndex=False
+        if self.IndexReady and self.SecondIndexReady:
+            self._indextimer = Timer(interval=self.indexUpdateFreq, function=self.getIndexes)
+            self._indextimer.start()
+        else:
+            self._indextimer = Timer(interval=1, function=self.getIndexes)
+            self._indextimer.start()
+
 
         # IndexResult=self.getIndex()
         # if not self.Index_ErrorIndication :
@@ -297,12 +304,7 @@ class measurement_Thread(Thread):
     def startMetrics(self):
         self.logging.warning("Start Measurement : %s :: %s ",self.host_data['ID'], self.MeasurementID)
         self.managers=set()
-        if not self.indexready:
-            return
-        if self.isDoubleIndexed:
-            if not self.SecondIndexReady:
-                return
-
+        
         for MetricId in self.measurement['MetricIDs']:
                     self.logging.info("Start Metric thread measurement: %s :: %s Metric: %s",self.host_data['ID'], self.MeasurementID, MetricId)
                     metric=Metric(self,MetricId) 
@@ -335,7 +337,7 @@ class measurement_Thread(Thread):
 
     def waitingMeasurementData(self):
         self.logging.warning("waitingMeasurementData")
-        self.MeasurementMetricError=0
+        self.MeasurementMetricError={}
         while not self.MeasurementReady :
             if self.kill:
                 break
@@ -343,7 +345,7 @@ class measurement_Thread(Thread):
             for metric_instance in self.managers:
                 metric_instance.join(0.5)
                 if metric_instance.MetricError ==True :
-                    self.MeasurementMetricError +=1 
+                    self.MeasurementMetricError.add(metric_instance.MetricId)
                 if metric_instance.dataready ==True or metric_instance.MetricError ==True :
                     n=n+1
                 else:
@@ -352,12 +354,16 @@ class measurement_Thread(Thread):
 
             if n >= len(self.managers):
                 self.MeasurementReady=True
+                for metric_instance in self.managers:
+                    metric_instance.join(0.5)
+
                 break
             if int(time.time()-self.start) >self.timeoutTime:
                 self.timeout=True
                 break
-
             time.sleep(self.waitMeasurementData)
+        self.logging.error("All metric gathered metric ok: %s, metric error: %s", n-len(self.MeasurementMetricError), len(self.MeasurementMetricError))
+
     def DataGather(self):
         self.logging.error("Starting DataGather")
 
@@ -379,21 +385,27 @@ class measurement_Thread(Thread):
         #    self.getIndexes()
         #except Exception as s:
         #    self.logging.error("Error in index process: %s", s )
-        if self.Index_ErrorIndication==False and self.SecondIndex_ErrorIndication==False:
-            self.MeasurementReady=False
-            try:
-                self.startMetrics()
-                self.runMetrics()
-                self.waitingMeasurementData() 
-            except Exception as s:
-                self.logging.error("Error in data process: %s", s )
-        else:
-            self.logging.error("No index data")
+        #if self.Index_ErrorIndication==False and self.SecondIndex_ErrorIndication==False:
+        self.MeasurementReady=False
+        try:
+            self.startMetrics()
+            self.runMetrics()
+            self.waitingMeasurementData() 
+        except Exception as s:
+            self.logging.error("Error in data process: %s", s )
+        #else:
+        #    self.logging.error("No index data")
+        if self.RunIndex :
+            self.logging.error("Wait the index" )
+            while self.RunIndex:
+                time.sleep(self.waitMeasurementData)
 
         self.processTime=time.time()-self.start
-        if not self.Index_ErrorIndication and self.MeasurementReady:
+        if self.SecondIndexReady and self.IndexReady and self.MeasurementReady:
             self.logging.error("Measurement data ready %s %s Time: %0.3f sec MetricError: %s",self.host_data['ID'], self.MeasurementID, self.processTime, self.MeasurementMetricError)
             self.getJsonResult()
+        else:
+            self.logging.error("Measurement data ERROR %s %s Time: %0.3f sec MetricError: %s",self.host_data['ID'], self.MeasurementID, self.processTime, self.MeasurementMetricError)
             #self.root.statistic.AddMeasurmentTime(self.processTime)
         if self.timeout:
             self.logging.error("Measurement timeout %s %s Time: %0.3f sec",self.host_data['ID'], self.MeasurementID, self.processTime)
@@ -417,7 +429,7 @@ class measurement_Thread(Thread):
         #while True:
         self._indextimer = Timer(interval=randint(1,2), function=self.getIndexes)
         self._indextimer.start()
-        self._timer = Timer(interval=randint(10,self.updateFreq/2), function=self.DataGather)
+        self._timer = Timer(interval=randint(5,10), function=self.DataGather)
         self._timer.start()
 
         while not self.kill:
@@ -497,16 +509,23 @@ class measurement_Thread(Thread):
         meas_data=[]
         res={}
         self.logging.debug("Get JsonResoult Mode:%s host:%s Measurment:%s MeasurementReady:%s", self.measurement['Mode'], self.address, self.MeasurementID,self.MeasurementReady)
+        try :
+            self.IndexedIndexResult=self.root.loadjson( self.config['base']['tmp_dir']+'/json_dump/{}-{}-Index.json'.format( self.host_data['ID'], self.MeasurementID ) )
+            self.SecondIndexedIndexResult=self.root.loadjson( self.config['base']['tmp_dir']+'/json_dump/{}-{}-SecondIndex.json'.format( self.host_data['ID'], self.MeasurementID ) )
+        except Exception as s:
+            self.logging.error("Error reading index JSON files %s", s)
+            return
         if self.MeasurementReady:
             try: 
+                self.logging.debug("Index size:%s SecondIndex size:%s host:%s Measurment:%s MeasurementReady:%s", len(self.IndexedIndexResult), len(self.SecondIndexedIndexResult),  self.address, self.MeasurementID,self.MeasurementReady)   
                 for indexKey in self.IndexedIndexResult: 
                     indexValue=self.IndexedIndexResult[indexKey]
                     res.update({indexKey:{}})
                     tmp_data={}
                     for metric_instance in self.managers:
+                        #metric_instance.join(0.5)
                         if metric_instance.isDoubleIndexed:
                             for secIndexKey in self.SecondIndexedIndexResult:
-
                                 secIndexValue=self.SecondIndexedIndexResult[secIndexKey]
                                 #res[indexKey]={secIndexKey:{}}
                                 indexed_value=None
@@ -519,6 +538,7 @@ class measurement_Thread(Thread):
                                     except Exception as s:
                                         pass
                                         #self.logging.error('Tag append error %s', s)
+                                        
                                 else:
                                     try:
                                         indexed_value=metric_instance.indexed_result[indexKey][secIndexKey]
@@ -526,6 +546,7 @@ class measurement_Thread(Thread):
                                     except Exception as s:
                                         pass
                                         #self.logging.error('fields append error %s', s)
+                                        
                                 if len(tags)>0 or len(fields)>0:
                                     try:
                                         test=res[indexKey][secIndexKey]
@@ -539,7 +560,9 @@ class measurement_Thread(Thread):
 
                                     res[indexKey][secIndexKey]['tags'].update(tags.copy())
                                     res[indexKey][secIndexKey]['fields'].update(fields.copy())
-                        else:
+                                #print(res)                    
+                        ############## Simple index #####################
+                        else:  
                             indexed_value=None
                             tags={}
                             fields={}
@@ -574,7 +597,8 @@ class measurement_Thread(Thread):
                     #if indexKey >20:
                     #    break
 
-                    
+
+
                 for index in res:
                     for secindex in res[index]:
                         #print(res[index][secindex])
@@ -582,8 +606,10 @@ class measurement_Thread(Thread):
                             meas_data.append(res[index][secindex])
             except Exception as s:
                 self.logging.error("Json data error %s %s :: %s", self.host_data['ID'],  self.measurement['ID'] ,s)
+        self.logging.debug("Measurement data size%s %s :: %s", self.host_data['ID'],  self.measurement['ID'] ,len(meas_data))
         self.writeInflux(meas_data)
-
+        self.IndexedIndexResult={}
+        self.SecondIndexedIndexResult={}
 
 
     

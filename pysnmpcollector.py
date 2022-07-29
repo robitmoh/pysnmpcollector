@@ -82,7 +82,7 @@ if __name__=='__main__':
     config.read('./cfg/pysnmpcollector.cfg')
 
     try:
-        os.makedirs(config['logging']['logdir']+"/json_dump/")
+        os.makedirs(config['base']['tmp_dir']+"/json_dump/")
     except FileExistsError:
         # directory already exists
         pass
@@ -107,9 +107,9 @@ if __name__=='__main__':
     #print (parser.parse_args(['logging', '-L', 'www.example.com']))
     
     if args.this_subprocess=='y':
-        filename=config['logging']['logfile']  #+'-'+str(args.sub_end)
+        filename=config['logging']['logdir']+config['logging']['logfile']  #+'-'+str(args.sub_end)
     else:
-        filename=config['logging']['logfile']
+        filename=config['logging']['logdir']+config['logging']['logfile']
     logging.basicConfig(level=config['logging']['file_level'].upper(), format='[%(asctime)s] [%(levelname)s] [%(process)d] [%(threadName)s] %(message)s', 
         filename=filename, filemode='w')
     console = logging.StreamHandler()
@@ -138,12 +138,17 @@ if __name__=='__main__':
     host_file=config['base']['default_host_file']
     with open(host_file) as json_file:
         hosts=json.load(json_file)
-  
-    ############   Singel Process
+    
+    snmpHosts = set()
+    
+    ############   Single Process
     if config['base']['process_mode'].lower() == 'singleprocess':
-        statistic=Statistic()
+        statistic=Statistic(config)
+        from multiprocessing import Event
+        event = Event()
         Snmphost=SnmpHosts(event,config,statistic,hosts)
         Snmphost.start()
+        snmpHosts.add(Snmphost)
    
     #  MultiProcess        
    ###################################################################################xxx
@@ -161,7 +166,6 @@ if __name__=='__main__':
         manager.start()
         #inst = manager.SimpleClass()
         statistic = manager.Statistic(config)
-        snmpHosts = set()
         def host_pool( process_host):   
             print(process_host)
             Snmphost=SnmpHosts(event,config,statistic, hosts)
@@ -198,7 +202,7 @@ if __name__=='__main__':
         import subprocess
         from multiprocessing import Pool, cpu_count, Event
         event = Event()
-        snmpHosts = set()
+        
         if args.this_subprocess =='y':
             logging.error("Start Subprocess " + str(args.sub_start) +"-" + str(args.sub_end))
             statistic=Statistic(config)

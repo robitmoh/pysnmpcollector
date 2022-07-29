@@ -251,18 +251,21 @@ class Metric(Thread):
         try:
             secondIndexes={}
             for row in data:
-                if row.secondIndex==None :
-                    self.indexed_result[int(row.index)]=row.value
-                else:
-                    if preIndex == row.index or preIndex == None:
-                        secondIndexes[int(row.secondIndex)]=row.value
+                try:
+                    if row.secondIndex==None :
+                        self.indexed_result[str(row.index)]=row.value
                     else:
-                        self.indexed_result[int(preIndex)]=secondIndexes
-                        secondIndexes={}
-                        secondIndexes[int(row.secondIndex)]=row.value
-                preIndex=row.index
-                precSecondIndex=row.secondIndex
-           # print(self.indexed_result)
+                        if preIndex == row.index or preIndex == None:
+                            secondIndexes[str(row.secondIndex)]=row.value
+                        else:
+                            self.indexed_result[str(preIndex)]=secondIndexes
+                            secondIndexes={}
+                            secondIndexes[str(row.secondIndex)]=row.value
+                    preIndex=row.index
+                    precSecondIndex=row.secondIndex
+                except Exception as e_row:
+                    self.logging.error("Metric data error %s ::: %s",e_row,row)
+            #print(self.indexed_result)
 
         except Exception as s:
             self.logging.error('Walk data indexing error %s  %s ',self.MetricId, s)

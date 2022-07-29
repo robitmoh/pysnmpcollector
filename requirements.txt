@@ -3,3 +3,5 @@ influxdb==5.3.0
 netaddr==0.7.19
 psutil
 multiprocessing-logging
+pympler
+memory-profiler

@@ -64,11 +64,11 @@ class SnmpHosts(Thread):
         #    self.hosts=json.load(json_file)
         #self.lastHost=len(self.hosts)
 
-        with open('measurements.json') as json_file:
+        with open('./cfg/measurements.json') as json_file:
             self.measurementsConfig=json.load(json_file)
        
         
-        with open('metrics.json') as json_file:
+        with open('./cfg/metrics.json') as json_file:
             self.metrics=json.load(json_file)
 
    #  def run(self):
@@ -258,10 +258,16 @@ class SnmpHosts(Thread):
     def dumpjson(self,filename,data):
         try:
             with open(filename, 'w') as outfile:
-                json.dump(data, outfile,cls=ObjEncoder)
+                json.dump(data, outfile)
         except Exception as s:
             logging.error('Json file dump error'+ str(s))
-
+    
+    def loadjson(self,filename):
+        try:
+            with open(filename, 'r') as file:
+               return json.load(file)
+        except Exception as s:
+            logging.error('Json file load error'+ str(s))
 
     def run3(self):
             #for measurement_instance in self.RunningMeasurement:
@@ -306,14 +312,13 @@ class SnmpHosts(Thread):
         while True:
             start=time.time() 
             self.state='run'
-            if  self.GetRuningMeasurementsNumber() ==0:
-                
-                logging.error("Died measurements number %s %s", self.GetDiedMeasurementsNumber(), '')
+            #if  self.GetRuningMeasurementsNumber() ==0:
+            #    logging.error("Died measurements number %s %s", self.GetDiedMeasurementsNumber(), '')
                 #self.run3()
-            else:
-                logging.warning("Skip run high process number %s %s", proc.num_fds(), '')
+            #else:
+            #    logging.warning("Skip run high process number %s %s", proc.num_fds(), '')
             #print('Round time',time.time()-start, proc.num_fds())
-            logging.debug("SnmpHosts %s-%s   measurments: %s / %s -- ",self.startHost, self.lastHost,self.GetRuningMeasurementsNumber(), self.GetDiedMeasurementsNumber() )
+            logging.debug("SnmpHosts range %s-%s   measurments runing /died  %s / %s -- ",self.startHost, self.lastHost,self.GetRuningMeasurementsNumber(), self.GetDiedMeasurementsNumber() )
             for hostID in self.hostData:
                 for MeasurementID in self.hostData[hostID]:
                     measurment=self.hostData[hostID][MeasurementID]
