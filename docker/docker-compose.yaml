@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  pysnmpcollector:
+    image: "robitmoh/pysnmpcollector:latest"
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    container_name: Pysnmpcollector
+    #environment:
+    restart: always
+    volumes:
+       - ../cfg:/pysnmpcollector/cfg
+       - ../logs:/pysnmpcollector/logs
+       - ../tmp:/pysnmpcollector/tmp
+
+
