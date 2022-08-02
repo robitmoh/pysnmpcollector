@@ -14,7 +14,7 @@ from pympler import asizeof
 import json
 import gc
 # See SNMP.py module at the bottom of the question
-from snmp import v2c
+#from snmp import v2c
 
 
 from pysnmp.entity.rfc3413 import mibvar

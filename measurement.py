@@ -366,6 +366,8 @@ class measurement_Thread(Thread):
 
     def DataGather(self):
         self.logging.error("Starting DataGather")
+        self._timer = Timer(interval=self.updateFreq, function=self.DataGather)
+        self._timer.start()
 
         proc = psutil.Process()                    
         if proc.num_fds() >int(self.config['base']['fd_limit_low']):
@@ -412,9 +414,7 @@ class measurement_Thread(Thread):
             #self.root.statistic.IncTimeoutedMeasurment()
         self.stopMetrics()
         self.isRunning=False
-        self._timer = Timer(interval=self.updateFreq, function=self.DataGather)
-        self._timer.start()
-
+        
 
 
     def Setkill(self):
